@@ -47,6 +47,13 @@ Initial scaffold, committed directly to `main` during project setup.
 - Private GitHub repository at `TricretA/Scope-WA`, with `main` and
   `features` branches.
 
+### Fixed
+- `TemplateEngine` decided variable-vs-spintax by whether the value map
+  happened to contain the key for a given recipient, so a known-but-blank
+  variable could randomly resolve as spintax — caught by CI failing on the
+  first push (flaky `TemplateEngineTest`). Now decided by an explicit
+  `knownVariableNames` set (the CSV headers) instead of the per-row map.
+
 ### Notes
 - No Room entities yet — `data/` is intentionally empty past a README until
   Phase 2 designs the schema against real requirements.
