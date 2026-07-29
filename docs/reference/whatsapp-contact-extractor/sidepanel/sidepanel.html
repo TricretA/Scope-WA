@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WA Contact Extractor</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">⇩</span>
+        <div>
+          <div class="brand-title">WA Contact Extractor</div>
+          <div class="brand-sub">Export group members to CSV / Excel / VCF</div>
+        </div>
+      </div>
+      <button id="connPill" class="pill pill-loading" title="Click to open / focus WhatsApp Web">
+        <span class="dot"></span><span id="connText">Checking…</span>
+      </button>
+    </header>
+
+    <main>
+      <!-- STEP 1 — pick groups -->
+      <section class="card">
+        <div class="card-head"><span class="step">1</span><h2>Pick groups</h2></div>
+        <div class="row-between">
+          <span class="muted">Choose one or more groups to pull members from.</span>
+          <button id="fetchGroups" class="link-btn">Fetch my groups ↻</button>
+        </div>
+        <div id="groupSearchWrap" class="hidden" style="margin:8px 0">
+          <input id="groupSearch" class="input" placeholder="Filter groups…" />
+        </div>
+        <div id="groupList" class="grouplist">
+          <div class="muted" style="padding:14px;text-align:center">Click “Fetch my groups” to begin.</div>
+        </div>
+        <div id="groupTools" class="row-between hidden">
+          <label class="chk"><input type="checkbox" id="selAll" /> Select all</label>
+          <span id="selCount" class="muted"></span>
+        </div>
+      </section>
+
+      <!-- STEP 2 — extract -->
+      <section class="card" id="extractCard" hidden>
+        <div class="card-head"><span class="step">2</span><h2>Extract members</h2></div>
+        <button id="extractBtn" class="btn btn-primary">Extract selected groups</button>
+        <div id="extractStatus" class="status-line" style="margin-top:8px"></div>
+      </section>
+
+      <!-- STEP 3 — filters -->
+      <section class="card" id="filterCard" hidden>
+        <div class="card-head"><span class="step">3</span><h2>Filters</h2></div>
+        <div class="chk-grid">
+          <label class="chk"><input type="checkbox" id="fExcludeMe" checked /> Exclude me</label>
+          <label class="chk"><input type="checkbox" id="fExcludeAdmins" /> Exclude admins</label>
+          <label class="chk"><input type="checkbox" id="fOnlyAdmins" /> Only admins</label>
+          <label class="chk"><input type="checkbox" id="fExcludeSaved" /> Exclude saved contacts</label>
+          <label class="chk"><input type="checkbox" id="fOnlyUnnamed" /> Only members with no saved name</label>
+          <label class="chk"><input type="checkbox" id="fHideHidden" /> Hide privacy-hidden numbers</label>
+          <label class="chk"><input type="checkbox" id="fDropNoName" /> Drop members with no name at all</label>
+        </div>
+        <p class="hint">Members whose number WhatsApp hides (privacy / LID) are kept and marked
+          <code>hidden</code> so your counts stay honest — tick the box above to drop them.</p>
+      </section>
+
+      <!-- STEP 4 — preview -->
+      <section class="card" id="previewCard" hidden>
+        <div class="card-head"><span class="step">4</span><h2>Preview</h2></div>
+        <div class="counts">
+          <span class="c-added">👥 <b id="cTotal">0</b> members</span>
+          <span class="c-reach">✆ <b id="cReach">0</b> with number</span>
+          <span class="c-hidden">🔒 <b id="cHidden">0</b> hidden</span>
+          <span class="c-admin">★ <b id="cAdmin">0</b> admins</span>
+        </div>
+        <div class="table-wrap"><table id="previewTable"></table></div>
+        <div id="previewMore" class="muted"></div>
+      </section>
+
+      <!-- STEP 5 — export -->
+      <section class="card" id="exportCard" hidden>
+        <div class="card-head"><span class="step">5</span><h2>Export</h2></div>
+        <div class="field-row">
+          <label>Columns
+            <select id="fieldSet" class="select">
+              <option value="slim">Name + Number</option>
+              <option value="all">All details (role, groups, saved…)</option>
+            </select>
+          </label>
+          <label>TXT style
+            <select id="txtMode" class="select">
+              <option value="numbers">Numbers only</option>
+              <option value="name-number">Name: Number</option>
+            </select>
+          </label>
+        </div>
+        <label style="display:block;margin:8px 0">File name
+          <input id="fileName" class="input" value="whatsapp-contacts" />
+        </label>
+        <div class="btn-grid">
+          <button class="btn btn-ghost export" data-fmt="csv">CSV</button>
+          <button class="btn btn-ghost export" data-fmt="xlsx">Excel</button>
+          <button class="btn btn-ghost export" data-fmt="vcf">VCF</button>
+          <button class="btn btn-ghost export" data-fmt="txt">TXT</button>
+          <button class="btn btn-ghost export" data-fmt="json">JSON</button>
+        </div>
+        <div id="exportNote" class="status-line" style="margin-top:8px"></div>
+      </section>
+
+      <p class="footnote">
+        Read-only: this reads member lists already loaded in your WhatsApp Web session and never
+        adds, messages, or removes anyone. Use exported numbers responsibly and lawfully — respect
+        people's consent and privacy. Automating WhatsApp Web may break its Terms.
+      </p>
+    </main>
+
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>

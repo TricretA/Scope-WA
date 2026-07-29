@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Pre-Compose window theme only; screen content is themed in ui/theme/Theme.kt -->
+    <style name="Theme.ScopeWa" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

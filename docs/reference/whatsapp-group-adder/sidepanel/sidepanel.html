@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WA Group Adder</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">✦</span>
+        <div>
+          <div class="brand-title">WA Group Adder</div>
+          <div class="brand-sub">Bulk-add contacts to a group</div>
+        </div>
+      </div>
+      <button id="connPill" class="pill pill-unknown" title="Click to open / focus WhatsApp Web">
+        <span class="dot"></span><span id="connText">Checking…</span>
+      </button>
+    </header>
+
+    <main>
+      <!-- STEP 1 — import -->
+      <section class="card">
+        <div class="card-head"><span class="step">1</span><h2>Import contacts</h2></div>
+        <label id="dropzone" class="dropzone" for="file">
+          <input id="file" type="file" accept=".csv,.vcf,.txt,text/csv,text/vcard,text/plain" hidden />
+          <div class="dz-inner">
+            <div class="dz-icon">⬆</div>
+            <div><strong>Drop a CSV, VCF or TXT</strong> or click to browse</div>
+            <div class="muted">Numbers without a country code default to +254 (Kenya)</div>
+          </div>
+        </label>
+
+        <!-- CSV column pickers (shown only for CSV) -->
+        <div id="csvCols" class="hidden" style="margin-top:10px">
+          <div class="field-row">
+            <label>Phone column<select id="phoneCol" class="select"></select></label>
+            <label>Name column (optional)<select id="nameCol" class="select"></select></label>
+          </div>
+        </div>
+
+        <div id="importInfo" class="hidden">
+          <div class="row-between">
+            <span id="importSummary" class="muted"></span>
+            <button id="clearFile" class="link-btn">Remove</button>
+          </div>
+          <div class="table-wrap"><table id="previewTable"></table></div>
+          <div id="previewMore" class="muted"></div>
+        </div>
+      </section>
+
+      <!-- STEP 2 — target group -->
+      <section class="card" id="groupCard" hidden>
+        <div class="card-head"><span class="step">2</span><h2>Target group</h2></div>
+        <div class="row-between">
+          <span class="muted">You must be an <b>admin</b> of the group to add people.</span>
+          <button id="fetchGroups" class="link-btn">Fetch my groups ↻</button>
+        </div>
+        <select id="groupSel" class="select"><option value="">— fetch groups —</option></select>
+        <div id="groupBanner" class="banner hidden"></div>
+      </section>
+
+      <!-- STEP 3 — pacing & safety -->
+      <section class="card" id="paceCard" hidden>
+        <div class="card-head"><span class="step">3</span><h2>Speed &amp; anti-ban safety</h2></div>
+        <div class="grid2">
+          <label>Min delay (s)<input id="minDelay" type="number" min="10" value="45" class="input" /></label>
+          <label>Max delay (s)<input id="maxDelay" type="number" min="11" value="90" class="input" /></label>
+          <label>Pause every N adds<input id="batchSize" type="number" min="0" value="5" class="input" /></label>
+          <label>Long pause (s)<input id="batchPause" type="number" min="0" value="420" class="input" /></label>
+          <label>Daily cap<input id="dailyCap" type="number" min="1" value="45" class="input" /></label>
+          <label>Stop after N fails<input id="stopAfterFails" type="number" min="2" value="3" class="input" /></label>
+        </div>
+        <p class="hint">Defaults are deliberately slow. Mass group-adding is the action WhatsApp
+          polices hardest — small batches + long randomized delays protect your number.</p>
+      </section>
+
+      <!-- STEP 4 — run -->
+      <section class="card" id="runCard" hidden>
+        <div class="card-head"><span class="step">4</span><h2>Add to group</h2></div>
+        <div class="btn-row">
+          <button id="startBtn" class="btn btn-primary">Start adding</button>
+        </div>
+        <div class="btn-row">
+          <button id="pauseBtn" class="btn btn-warn" hidden>Pause</button>
+          <button id="resumeBtn" class="btn btn-primary" hidden>Resume</button>
+          <button id="stopBtn" class="btn btn-danger" hidden>Stop</button>
+        </div>
+
+        <div id="progressWrap" class="hidden">
+          <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
+          <div class="counts">
+            <span class="c-added">✓ <b id="cAdded">0</b> added</span>
+            <span class="c-invite">✉ <b id="cInvite">0</b> need invite</span>
+            <span class="c-exists">• <b id="cExists">0</b> already in</span>
+            <span class="c-fail">✕ <b id="cFail">0</b> failed</span>
+            <span class="c-skip">– <b id="cSkip">0</b> skipped</span>
+            <span class="c-total"><b id="cDone">0</b>/<b id="cTotal">0</b></span>
+          </div>
+          <div id="statusLine" class="status-line"></div>
+          <div class="daily"><span>Added today</span><span><b id="dailyCount">0</b> / <span id="dailyCapLbl">45</span></span></div>
+        </div>
+
+        <div id="logWrap" class="hidden">
+          <div class="row-between">
+            <span class="muted">Results log</span>
+            <button id="downloadLog" class="link-btn">Download CSV report</button>
+          </div>
+          <div id="log" class="log"></div>
+        </div>
+      </section>
+
+      <p class="footnote">
+        Only add people who expect to join. Non-consensual mass adds can get your number
+        reported and banned. This tool automates WhatsApp Web and may break its Terms — use responsibly.
+      </p>
+    </main>
+
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>

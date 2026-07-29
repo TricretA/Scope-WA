@@ -1,0 +1,36 @@
+## Android / Gradle
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.jks
+*.keystore
+/app/release/
+/app/debug/
+
+## Gradle wrapper jar is regenerated locally (`gradle wrapper`) or by Android Studio.
+## CI provisions Gradle directly, so it is intentionally not committed.
+gradle/wrapper/gradle-wrapper.jar
+
+## Signing / secrets — never commit
+keystore.properties
+*.keystore
+*.jks
+google-services.json
+local.properties
+
+## Claude Code
+.claude/settings.local.json
+
+## Original client-supplied scratch folder — superseded by docs/ARCHITECTURE-V2-WHATSAPP.md
+## and docs/reference/. Stays on disk for local reference until deleted per CLAUDE.md; never tracked.
+/Suggested features/
+firebase-debug.log
+

@@ -1,0 +1,95 @@
+name: Release
+
+# Builds a signed release APK + update.json and publishes both to a GitHub
+# Release, whenever main is updated (only via an approved PR from features —
+# see CLAUDE.md). Same direct-install pipeline v1 uses (architecture doc
+# section 4) — no Play Store.
+#
+# Requires these repository secrets before it can produce a signed build:
+#   SCOPE_WA_KEYSTORE_BASE64  — `base64 -w0 release.keystore`
+#   SCOPE_WA_KEYSTORE_PASSWORD
+#   SCOPE_WA_KEY_ALIAS
+#   SCOPE_WA_KEY_PASSWORD
+# Until they're set, this workflow builds and verifies but skips signing/publishing.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Check signing secrets are configured
+        id: signing
+        run: |
+          if [ -n "${{ secrets.SCOPE_WA_KEYSTORE_BASE64 }}" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Signing secrets not set yet — building unsigned and skipping publish. See this file's header comment."
+          fi
+
+      - name: Decode signing keystore
+        if: steps.signing.outputs.configured == 'true'
+        run: |
+          echo "${{ secrets.SCOPE_WA_KEYSTORE_BASE64 }}" | base64 -d > app/release.keystore
+          cat > keystore.properties <<EOF
+          storeFile=release.keystore
+          storePassword=${{ secrets.SCOPE_WA_KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.SCOPE_WA_KEY_ALIAS }}
+          keyPassword=${{ secrets.SCOPE_WA_KEY_PASSWORD }}
+          EOF
+
+      - name: Unit test the brain layer
+        run: gradle testDebugUnitTest --stacktrace
+
+      - name: Assemble release APK
+        run: gradle assembleRelease --stacktrace
+
+      - name: Read app version
+        id: version
+        run: |
+          VERSION_NAME=$(grep -m1 'versionName = ' app/build.gradle.kts | sed -E 's/.*"(.*)".*/\1/')
+          VERSION_CODE=$(grep -m1 'versionCode = ' app/build.gradle.kts | grep -oE '[0-9]+')
+          echo "name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
+
+      - name: Generate update.json
+        if: steps.signing.outputs.configured == 'true'
+        run: |
+          cat > update.json <<EOF
+          {
+            "versionCode": ${{ steps.version.outputs.code }},
+            "versionName": "${{ steps.version.outputs.name }}",
+            "apkUrl": "https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.name }}/scope-wa.apk",
+            "notes": "See CHANGELOG.md"
+          }
+          EOF
+
+      - name: Publish GitHub Release
+        if: steps.signing.outputs.configured == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.name }}
+          name: Scope WA v${{ steps.version.outputs.name }}
+          body_path: CHANGELOG.md
+          files: |
+            app/build/outputs/apk/release/*.apk
+            update.json

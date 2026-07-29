@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Scope WA</string>
+    <string name="accessibility_service_label">Scope WA — WhatsApp automation</string>
+    <string name="accessibility_service_description">Lets Scope WA read WhatsApp\'s screen and tap buttons on your behalf to send messages, extract group members, and add people to groups. It only acts while a campaign you started is running.</string>
+</resources>

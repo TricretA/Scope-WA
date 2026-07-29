@@ -1,0 +1,10 @@
+# One contact per line. Formats accepted:
+#   number
+#   number,name
+#   name,number
+# Lines starting with # are ignored. Numbers without a country code get +254.
+0712345678,Alice Wanjiru
+Brian Otieno,0723456789
+254701234567
++2547 33 44 55 66, Carol
+0790 111 222

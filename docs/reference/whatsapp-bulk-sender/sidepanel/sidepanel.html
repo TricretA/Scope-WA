@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WA Bulk Merge</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">✦</span>
+        <div>
+          <div class="brand-title">WA Bulk Merge</div>
+          <div class="brand-sub">Personalized WhatsApp sender</div>
+        </div>
+      </div>
+      <button id="connPill" class="pill pill-unknown" title="Click to open / focus WhatsApp Web">
+        <span class="dot"></span><span id="connText">Checking…</span>
+      </button>
+    </header>
+
+    <main>
+      <!-- STEP 1 — CSV -->
+      <section class="card">
+        <div class="card-head"><span class="step">1</span><h2>Upload contacts (CSV)</h2></div>
+        <label id="dropzone" class="dropzone" for="csvFile">
+          <input id="csvFile" type="file" accept=".csv,text/csv" hidden />
+          <div class="dz-inner">
+            <div class="dz-icon">⬆</div>
+            <div><strong>Drop CSV here</strong> or click to browse</div>
+            <div class="muted">First row must be column headers</div>
+          </div>
+        </label>
+        <div id="csvInfo" class="hidden">
+          <div class="row-between">
+            <span id="csvSummary" class="muted"></span>
+            <button id="clearCsv" class="link-btn">Remove</button>
+          </div>
+          <div class="table-wrap"><table id="previewTable"></table></div>
+          <div id="previewMore" class="muted"></div>
+        </div>
+      </section>
+
+      <!-- STEP 2 — phone column -->
+      <section class="card" id="phoneCard" hidden>
+        <div class="card-head"><span class="step">2</span><h2>Phone column</h2></div>
+        <p class="muted">Pick the column that holds phone numbers <em>with country code</em> (e.g. +1 415 555 1234).</p>
+        <select id="phoneCol" class="select"></select>
+        <div id="phoneStats" class="hint"></div>
+      </section>
+
+      <!-- STEP 3 — message -->
+      <section class="card" id="msgCard" hidden>
+        <div class="card-head"><span class="step">3</span><h2>Message template</h2></div>
+        <p class="muted">Click a column to insert it. Use <code>{{col|fallback}}</code> for a default when a cell is empty.</p>
+        <div id="varChips" class="chips"></div>
+        <textarea id="template" class="textarea" rows="5" placeholder="Hi {{name|there}}, ..."></textarea>
+        <div class="preview-box">
+          <div class="preview-label">Preview — first contact</div>
+          <div id="msgPreview" class="preview-bubble">—</div>
+        </div>
+      </section>
+
+      <!-- STEP 4 — pacing -->
+      <section class="card" id="paceCard" hidden>
+        <div class="card-head"><span class="step">4</span><h2>Sending speed &amp; safety</h2></div>
+        <div class="grid2">
+          <label>Min delay (s)<input id="minDelay" type="number" min="2" value="8" class="input" /></label>
+          <label>Max delay (s)<input id="maxDelay" type="number" min="3" value="20" class="input" /></label>
+          <label>Pause every N msgs<input id="batchSize" type="number" min="0" value="25" class="input" /></label>
+          <label>Long pause (s)<input id="batchPause" type="number" min="0" value="150" class="input" /></label>
+        </div>
+        <p class="hint">Randomized delays + periodic long pauses reduce the risk of WhatsApp flagging the number.</p>
+      </section>
+
+      <!-- STEP 5 — run -->
+      <section class="card" id="runCard" hidden>
+        <div class="card-head"><span class="step">5</span><h2>Send</h2></div>
+        <div class="btn-row">
+          <button id="testBtn" class="btn btn-ghost">Test (row 1 only)</button>
+          <button id="startBtn" class="btn btn-primary">Start sending</button>
+        </div>
+        <div class="btn-row">
+          <button id="pauseBtn" class="btn btn-warn" hidden>Pause</button>
+          <button id="resumeBtn" class="btn btn-primary" hidden>Resume</button>
+          <button id="stopBtn" class="btn btn-danger" hidden>Stop</button>
+        </div>
+
+        <div id="progressWrap" class="hidden">
+          <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
+          <div class="counts">
+            <span class="c-sent">✓ <b id="cSent">0</b> sent</span>
+            <span class="c-fail">✕ <b id="cFail">0</b> failed</span>
+            <span class="c-skip">– <b id="cSkip">0</b> skipped</span>
+            <span class="c-total"><b id="cDone">0</b>/<b id="cTotal">0</b></span>
+          </div>
+          <div id="statusLine" class="status-line"></div>
+        </div>
+
+        <div id="logWrap" class="hidden">
+          <div class="row-between">
+            <span class="muted">Results log</span>
+            <button id="downloadLog" class="link-btn">Download CSV report</button>
+          </div>
+          <div id="log" class="log"></div>
+        </div>
+      </section>
+
+      <p class="footnote">
+        Use responsibly and only with contacts who expect to hear from you. Bulk automation
+        can violate WhatsApp's Terms and risk your number being banned.
+      </p>
+    </main>
+
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>
