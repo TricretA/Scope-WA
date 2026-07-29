@@ -30,7 +30,8 @@ class TemplateEngineTest {
     @Test
     fun `variable with fallback uses literal fallback when value is missing`() {
         val engine = TemplateEngine()
-        val result = engine.render("Hi {name|there}", emptyMap())
+        // "name" is a known CSV column, just absent for this particular recipient row.
+        val result = engine.render("Hi {name|there}", emptyMap(), knownVariableNames = setOf("name"))
         assertEquals("Hi there", result)
     }
 

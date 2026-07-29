@@ -13,19 +13,30 @@ package com.tricreta.scopewa.brain.template
  *    key, so one option is picked at random for this recipient.
  *
  * Variable keys are matched case-insensitively against the CSV column names.
+ *
+ * Whether a block is "variable with fallback" vs. spintax is decided by
+ * [knownVariableNames] (the CSV's column headers), not by whether
+ * [variables] happens to hold a value for this particular recipient — a
+ * value can legitimately be missing/blank for one row without turning the
+ * block into a random spintax pick.
  */
 class TemplateEngine(private val random: () -> Double = Math::random) {
 
     private val blockPattern = Regex("\\{([^{}]*)}")
 
-    fun render(template: String, variables: Map<String, String>): String {
+    fun render(
+        template: String,
+        variables: Map<String, String>,
+        knownVariableNames: Set<String> = variables.keys
+    ): String {
         val lowerVariables = variables.mapKeys { it.key.trim().lowercase() }
+        val lowerKnownNames = knownVariableNames.mapTo(mutableSetOf()) { it.trim().lowercase() }
         return blockPattern.replace(template) { match ->
-            resolveBlock(match.groupValues[1], lowerVariables)
+            resolveBlock(match.groupValues[1], lowerVariables, lowerKnownNames)
         }
     }
 
-    private fun resolveBlock(rawBlock: String, variables: Map<String, String>): String {
+    private fun resolveBlock(rawBlock: String, variables: Map<String, String>, knownNames: Set<String>): String {
         val segments = rawBlock.split("|").map { it.trim() }
         if (segments.isEmpty() || segments.all { it.isEmpty() }) return ""
 
@@ -33,7 +44,7 @@ class TemplateEngine(private val random: () -> Double = Math::random) {
 
         return when {
             segments.size == 1 -> variables[firstKey] ?: "{${segments[0]}}"
-            variables.containsKey(firstKey) -> {
+            knownNames.contains(firstKey) -> {
                 val value = variables[firstKey]
                 if (!value.isNullOrBlank()) value else resolveFallbackChain(segments.drop(1), variables)
             }
